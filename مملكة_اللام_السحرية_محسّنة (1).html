@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>مملكة اللام السحرية</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #FFD700;
+    --gold-dark: #B8860B;
+    --silver: #C0C0C0;
+    --silver-dark: #708090;
+    --sun-color: #FF8C00;
+    --moon-color: #4169E1;
+    --bg1: #1a0533;
+    --bg2: #0d1b4b;
+    --star-color: #FFD700;
+    --heart-color: #FF4466;
+    --green: #00E676;
+    --purple: #9C27B0;
+    --pink: #FF69B4;
+    --sky: #87CEEB;
+    --grass: #228B22;
+  }
+
+  body {
+    font-family: 'Tajawal', 'Arial', sans-serif;
+    direction: rtl;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .screen.active { display: flex; }
+
+  /* ===== ANIMATED BACKGROUND ===== */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== START SCREEN ===== */
+  #start-screen {
+    background: linear-gradient(160deg, #0a0020 0%, #1a0533 40%, #0d1b4b 100%);
+    z-index: 10;
+  }
+
+  .start-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    z-index: 2;
+    padding: 20px;
+    max-width: 680px;
+    width: 95%;
+  }
+
+  .game-logo {
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    background: linear-gradient(90deg, #FFD700, #FF8C00, #FFD700, #FFF8DC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    text-shadow: none;
+    filter: drop-shadow(0 0 18px #FFD700aa);
+    animation: logoPulse 2.5s infinite alternate;
+  }
+
+  @keyframes logoPulse {
+    from { filter: drop-shadow(0 0 12px #FFD700aa); }
+    to { filter: drop-shadow(0 0 30px #FFD700ff) drop-shadow(0 0 60px #FF8C0066); }
+  }
+
+  .subtitle {
+    color: #B0E0E6;
+    font-size: clamp(13px, 2.5vw, 18px);
+    text-align: center;
+    opacity: 0.9;
+    letter-spacing: 1px;
+  }
+
+  .student-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(65,105,225,0.12));
+    border: 2px solid rgba(255,215,0,0.4);
+    border-radius: 16px;
+    padding: 14px 24px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(255,215,0,0.18), inset 0 1px 0 rgba(255,255,255,0.1);
+    width: 100%;
+  }
+
+  .student-card p { color: #E0E0FF; font-size: clamp(11px, 2vw, 14px); margin: 3px 0; }
+  .student-card .sname { color: #FFD700; font-size: clamp(13px, 2.5vw, 17px); font-weight: 700; }
+  .student-card .sschool { color: #87CEEB; font-size: clamp(11px, 1.8vw, 14px); }
+
+  .name-input-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .name-input-wrap label { color: #FFD700; font-size: clamp(13px, 2.2vw, 16px); font-weight: 700; }
+
+  #player-name-input {
+    width: 100%;
+    max-width: 340px;
+    padding: 12px 18px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Tajawal', Arial, sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+    direction: rtl;
+  }
+  #player-name-input:focus { border-color: #FFD700; box-shadow: 0 0 16px rgba(255,215,0,0.4); }
+  #player-name-input::placeholder { color: rgba(255,255,255,0.4); }
+
+  .btn-start {
+    padding: 14px 44px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: #1a0533;
+    font-size: clamp(15px, 3vw, 20px);
+    font-weight: 900;
+    font-family: 'Tajawal', Arial, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 28px rgba(255,140,0,0.5), 0 2px 0 rgba(0,0,0,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: btnFloat 2s ease-in-out infinite;
+  }
+  @keyframes btnFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .btn-start:hover { transform: scale(1.07) translateY(-3px); box-shadow: 0 10px 36px rgba(255,140,0,0.65); }
+  .btn-start:active { transform: scale(0.97); }
+
+  .kings-preview {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .king-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 2px solid;
+    backdrop-filter: blur(6px);
+    min-width: 120px;
+  }
+  .king-sun { border-color: rgba(255,215,0,0.5); background: rgba(255,140,0,0.1); }
+  .king-moon { border-color: rgba(135,206,235,0.5); background: rgba(65,105,225,0.1); }
+  .king-icon { font-size: 36px; }
+  .king-name { font-size: 13px; font-weight: 700; }
+  .king-sun .king-name { color: #FFD700; }
+  .king-moon .king-name { color: #87CEEB; }
+  .king-letters { font-size: 10px; color: rgba(255,255,255,0.65); text-align: center; line-height: 1.6; }
+
+  /* ===== HUD ===== */
+  #hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: linear-gradient(180deg, rgba(10,0,32,0.95) 0%, rgba(10,0,32,0.6) 100%);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .hud-group { display: flex; align-items: center; gap: 8px; }
+
+  .hud-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: clamp(10px, 1.8vw, 13px);
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .hud-item .emoji { font-size: 14px; }
+  .hud-item span { color: #FFD700; }
+
+  .lives-display { display: flex; gap: 3px; }
+  .heart { font-size: 16px; transition: transform 0.3s; filter: drop-shadow(0 0 4px #FF4466); }
+  .heart.lost { filter: grayscale(1) opacity(0.3); transform: scale(0.8); }
+
+  #progress-bar-wrap {
+    flex: 1;
+    max-width: 180px;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00E676, #FFD700);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  #timer-display {
+    font-size: clamp(11px, 2vw, 14px);
+    font-weight: 700;
+    color: #FF8C00;
+    padding: 4px 10px;
+    background: rgba(255,140,0,0.1);
+    border: 1px solid rgba(255,140,0,0.3);
+    border-radius: 20px;
+  }
+  #timer-display.danger { color: #FF4466; border-color: rgba(255,68,102,0.5); animation: timerPulse 0.5s infinite; }
+  @keyframes timerPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .sound-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .sound-btn:hover { background: rgba(255,255,255,0.15); }
+
+  /* ===== GAME AREA ===== */
+  #game-screen {
+    background: transparent;
+    z-index: 5;
+  }
+
+  #game-area {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== CASTLES ===== */
+  .castle-zone {
+    position: absolute;
+    bottom: 0;
+    width: 42%;
+    height: 55%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    transition: transform 0.2s;
+    z-index: 20;
+  }
+
+  #castle-sun { right: 2%; }
+  #castle-moon { left: 2%; }
+
+  .castle-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+  }
+
+  .drop-zone {
+    position: absolute;
+    bottom: 8%;
+    width: 68%;
+    height: 38%;
+    border-radius: 12px;
+    border: 3px dashed;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 25;
+  }
+
+  #castle-sun .drop-zone {
+    border-color: rgba(255,215,0,0.4);
+    background: rgba(255,140,0,0.06);
+  }
+  #castle-moon .drop-zone {
+    border-color: rgba(135,206,235,0.4);
+    background: rgba(65,105,225,0.06);
+  }
+
+  .drop-zone.drag-over-sun {
+    border-color: #FFD700 !important;
+    background: rgba(255,215,0,0.18) !important;
+    box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1);
+    transform: scale(1.03);
+  }
+  .drop-zone.drag-over-moon {
+    border-color: #87CEEB !important;
+    background: rgba(135,206,235,0.18) !important;
+    box-shadow: 0 0 30px rgba(135,206,235,0.4), inset 0 0 20px rgba(135,206,235,0.1);
+    transform: scale(1.03);
+  }
+
+  .castle-label {
+    position: absolute;
+    bottom: -8px;
+    font-size: clamp(11px, 2.2vw, 15px);
+    font-weight: 900;
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  #castle-sun .castle-label {
+    background: linear-gradient(135deg, #B8860B, #FFD700);
+    color: #1a0533;
+    box-shadow: 0 2px 12px rgba(255,215,0,0.5);
+  }
+  #castle-moon .castle-label {
+    background: linear-gradient(135deg, #4169E1, #87CEEB);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(65,105,225,0.5);
+  }
+
+  /* ===== FALLING WORDS ===== */
+  .word-card {
+    position: absolute;
+    top: -80px;
+    padding: 10px 18px;
+    border-radius: 16px;
+    font-size: clamp(16px, 3.5vw, 26px);
+    font-weight: 900;
+    cursor: grab;
+    user-select: none;
+    z-index: 50;
+    transition: box-shadow 0.2s;
+    border: 3px solid rgba(255,255,255,0.3);
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.06));
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    touch-action: none;
+  }
+  .word-card:active { cursor: grabbing; }
+  .word-card.dragging {
+    z-index: 200;
+    transform: scale(1.1) rotate(2deg);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .word-card.wrong-anim {
+    animation: shake 0.5s ease;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-12px) rotate(-3deg); }
+    40% { transform: translateX(12px) rotate(3deg); }
+    60% { transform: translateX(-8px) rotate(-2deg); }
+    80% { transform: translateX(8px) rotate(2deg); }
+  }
+  .word-card.correct-anim {
+    animation: flyAway 0.7s ease forwards;
+  }
+  @keyframes flyAway {
+    0% { transform: scale(1.1); opacity: 1; }
+    50% { transform: scale(1.3) translateY(-30px); opacity: 0.8; }
+    100% { transform: scale(0) translateY(-100px); opacity: 0; }
+  }
+
+  /* ===== GUIDE CHARACTER ===== */
+  #guide {
+    position: fixed;
+    bottom: 12%;
+    right: 2%;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    pointer-events: none;
+  }
+
+  #guide-bubble {
+    background: rgba(255,255,255,0.95);
+    color: #1a0533;
+    font-size: clamp(10px, 2vw, 13px);
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 150px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s;
+    direction: rtl;
+  }
+  #guide-bubble.show { opacity: 1; transform: scale(1); }
+
+  #guide-char {
+    width: 70px;
+    height: 70px;
+    animation: guideBob 2s ease-in-out infinite;
+  }
+
+  @keyframes guideBob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+  }
+
+  /* ===== VILLAIN ===== */
+  #villain {
+    position: absolute;
+    z-index: 60;
+    cursor: pointer;
+    display: none;
+    animation: villainFloat 1.5s ease-in-out infinite;
+  }
+  @keyframes villainFloat {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+  }
+  #villain-svg { width: 65px; height: 65px; }
+
+  /* ===== FEEDBACK ===== */
+  #feedback-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    pointer-events: none;
+  }
+
+  .feedback-msg {
+    font-size: clamp(22px, 5vw, 42px);
+    font-weight: 900;
+    padding: 16px 36px;
+    border-radius: 20px;
+    animation: feedbackPop 1.2s ease forwards;
+    display: none;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .feedback-msg.show { display: block; }
+  .feedback-correct {
+    background: linear-gradient(135deg, #00C853, #00E676);
+    color: #fff;
+    border: 3px solid rgba(255,255,255,0.4);
+  }
+  .feedback-wrong {
+    background: linear-gradient(135deg, #D32F2F, #FF5252);
+    color: #fff;
+    border: 3px solid rgba(255,255,255,0.3);
+  }
+
+  @keyframes feedbackPop {
+    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    30% { transform: scale(1.2) rotate(3deg); opacity: 1; }
+    60% { transform: scale(1) rotate(0); opacity: 1; }
+    85% { transform: scale(1) translateY(0); opacity: 1; }
+    100% { transform: scale(0.8) translateY(-40px); opacity: 0; }
+  }
+
+  /* ===== PARTICLES ===== */
+  #particles-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 140;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFly 1.2s ease-out forwards;
+  }
+  @keyframes particleFly {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
+  }
+
+  .star-particle {
+    font-size: 20px;
+    animation: starFly 1.5s ease-out forwards;
+  }
+  @keyframes starFly {
+    0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--px), var(--py)) scale(0) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== MINI GAME ===== */
+  #mini-game-screen {
+    z-index: 200;
+    background: radial-gradient(ellipse at center, #1a0040 0%, #000820 100%);
+  }
+
+  .mini-game-title {
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 900;
+    color: #FFD700;
+    text-align: center;
+    margin-bottom: 14px;
+    filter: drop-shadow(0 0 12px #FFD700);
+  }
+
+  #mini-game-area {
+    position: relative;
+    width: min(500px, 90vw);
+    height: min(400px, 55vh);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 16px;
+    background: rgba(0,0,0,0.3);
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  .mini-target {
+    position: absolute;
+    cursor: pointer;
+    animation: miniPop 0.3s ease;
+    transition: transform 0.1s;
+  }
+  .mini-target:hover { transform: scale(1.15); }
+  @keyframes miniPop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .mini-target.hit { animation: miniHit 0.3s forwards; }
+  @keyframes miniHit {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+
+  #mini-timer-bar {
+    height: 8px;
+    background: linear-gradient(90deg, #FF4466, #FFD700);
+    border-radius: 4px;
+    width: 100%;
+    transition: width 0.1s linear;
+    margin-bottom: 10px;
+  }
+
+  .mini-score-display {
+    font-size: 18px;
+    color: #FFD700;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* ===== TREASURE / LEVEL UP ===== */
+  #level-screen {
+    z-index: 200;
+    background: radial-gradient(ellipse at center, #1a0530 0%, #000820 100%);
+  }
+
+  .treasure-box {
+    font-size: 100px;
+    animation: treasureOpen 1.5s ease forwards;
+    cursor: pointer;
+    filter: drop-shadow(0 0 30px #FFD700);
+  }
+  @keyframes treasureOpen {
+    0% { transform: scale(0.5) rotate(-10deg); }
+    40% { transform: scale(1.3) rotate(5deg); }
+    70% { transform: scale(1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .medal-earned {
+    font-size: clamp(16px, 3.5vw, 26px);
+    font-weight: 900;
+    color: #FFD700;
+    text-align: center;
+    margin: 12px 0;
+    filter: drop-shadow(0 0 8px #FFD700);
+  }
+
+  .badge-icon { font-size: 60px; animation: badgeSpin 1s ease; }
+  @keyframes badgeSpin {
+    0% { transform: rotateY(0deg) scale(0); }
+    50% { transform: rotateY(180deg) scale(1.3); }
+    100% { transform: rotateY(360deg) scale(1); }
+  }
+
+  .btn-next-level {
+    padding: 12px 36px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #00E676, #00C853);
+    color: #fff;
+    font-size: clamp(14px, 2.8vw, 18px);
+    font-weight: 900;
+    font-family: 'Tajawal', Arial, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,230,118,0.4);
+    margin-top: 16px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: btnFloat 2s infinite;
+  }
+  .btn-next-level:hover { transform: scale(1.06); box-shadow: 0 8px 30px rgba(0,230,118,0.5); }
+
+  /* ===== SHOP ===== */
+  #shop-screen {
+    z-index: 200;
+    background: radial-gradient(ellipse at center, #0a0020 0%, #000820 100%);
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .shop-title {
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 900;
+    color: #FFD700;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 10px #FFD700);
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .shop-item {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,215,0,0.2);
+    border-radius: 14px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .shop-item:hover { border-color: rgba(255,215,0,0.6); background: rgba(255,215,0,0.08); transform: translateY(-3px); }
+  .shop-item.owned { border-color: #00E676; background: rgba(0,230,118,0.08); }
+  .shop-item.equipped { border-color: #FFD700; background: rgba(255,215,0,0.15); box-shadow: 0 0 18px rgba(255,215,0,0.3); }
+
+  .shop-emoji { font-size: 36px; }
+  .shop-name { font-size: 12px; color: #fff; font-weight: 700; text-align: center; }
+  .shop-price { font-size: 11px; color: #FFD700; }
+  .shop-status { font-size: 10px; color: #00E676; font-weight: 700; }
+
+  .btn-close-shop {
+    padding: 10px 28px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Tajawal', Arial, sans-serif;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s;
+  }
+  .btn-close-shop:hover { background: rgba(255,255,255,0.15); }
+
+  /* ===== WIN SCREEN ===== */
+  #win-screen {
+    z-index: 300;
+    background: radial-gradient(ellipse at center, #1a0040 0%, #000820 100%);
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .win-trophy { font-size: 80px; animation: trophyBounce 1s ease infinite alternate; }
+  @keyframes trophyBounce {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-12px) scale(1.05); }
+  }
+
+  .win-title {
+    font-size: clamp(22px, 5vw, 40px);
+    font-weight: 900;
+    background: linear-gradient(90deg, #FFD700, #FF8C00, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    filter: drop-shadow(0 0 16px #FFD700aa);
+    margin: 12px 0;
+  }
+
+  /* ===== CERTIFICATE ===== */
+  #cert-section {
+    background: linear-gradient(135deg, #fffbf0, #fff9e3);
+    border: 4px solid #B8860B;
+    border-radius: 20px;
+    padding: 28px 32px;
+    max-width: 560px;
+    width: 95%;
+    text-align: center;
+    direction: rtl;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,215,0,0.05);
+    position: relative;
+    overflow: hidden;
+    margin: 16px auto;
+  }
+
+  #cert-section::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 2px solid rgba(184,134,11,0.3);
+    border-radius: 14px;
+    pointer-events: none;
+  }
+
+  .cert-title { font-size: clamp(16px, 3vw, 22px); font-weight: 900; color: #B8860B; margin-bottom: 6px; }
+  .cert-game-name { font-size: clamp(13px, 2.5vw, 17px); color: #8B6914; margin-bottom: 12px; }
+  .cert-student { font-size: clamp(15px, 3vw, 20px); font-weight: 900; color: #1a0533; margin: 8px 0; }
+  .cert-school { font-size: clamp(11px, 2vw, 14px); color: #666; margin-bottom: 12px; }
+  .cert-player-label { font-size: 13px; color: #888; }
+  .cert-player-name { font-size: clamp(18px, 4vw, 28px); font-weight: 900; color: #B8860B; }
+  .cert-stats { display: flex; justify-content: center; gap: 24px; margin: 14px 0; flex-wrap: wrap; }
+  .cert-stat { font-size: 13px; color: #555; }
+  .cert-stat span { font-weight: 700; color: #B8860B; font-size: 18px; display: block; }
+  .cert-msg { font-size: clamp(11px, 2vw, 13px); color: #555; line-height: 1.7; margin: 12px 0; }
+  .cert-date { font-size: 11px; color: #999; margin-top: 8px; }
+
+  .cert-ornament {
+    font-size: 24px;
+    color: #B8860B;
+    opacity: 0.5;
+    letter-spacing: 8px;
+  }
+
+  .btn-print {
+    padding: 10px 28px;
+    border-radius: 50px;
+    border: 2px solid #B8860B;
+    background: linear-gradient(135deg, #B8860B, #FFD700);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Tajawal', Arial, sans-serif;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.15s;
+  }
+  .btn-print:hover { transform: scale(1.05); }
+
+  .btn-play-again {
+    padding: 12px 36px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #9C27B0, #E040FB);
+    color: #fff;
+    font-size: clamp(14px, 2.8vw, 18px);
+    font-weight: 900;
+    font-family: 'Tajawal', Arial, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(156,39,176,0.4);
+    margin-top: 16px;
+    transition: transform 0.15s;
+  }
+  .btn-play-again:hover { transform: scale(1.06); }
+
+  /* ===== REASON TOOLTIP ===== */
+  #reason-box {
+    position: fixed;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30,0,60,0.95);
+    border: 2px solid rgba(255,100,100,0.5);
+    border-radius: 14px;
+    padding: 10px 22px;
+    color: #FFB3B3;
+    font-size: clamp(12px, 2.2vw, 15px);
+    font-weight: 700;
+    text-align: center;
+    z-index: 160;
+    display: none;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(255,0,0,0.2);
+    max-width: 90vw;
+  }
+  #reason-box.show {
+    display: block;
+    animation: reasonSlide 2.5s ease forwards;
+  }
+  @keyframes reasonSlide {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    75% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  }
+
+  /* ===== SHOP BTN ===== */
+  #shop-btn {
+    position: fixed;
+    bottom: 14%;
+    left: 2%;
+    z-index: 80;
+    background: linear-gradient(135deg, #9C27B0, #E040FB);
+    border: none;
+    border-radius: 50%;
+    width: 48px; height: 48px;
+    cursor: pointer;
+    font-size: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(156,39,176,0.5);
+    transition: transform 0.2s;
+  }
+  #shop-btn:hover { transform: scale(1.1); }
+
+  /* ===== FIREWORKS CANVAS ===== */
+  #fireworks-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 290;
+    pointer-events: none;
+    display: none;
+  }
+
+  /* ===== RESPONSIVE - handled below ===== */
+
+  /* Loading screen */
+  #loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #0a0020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .loading-title { color: #FFD700; font-size: 24px; font-weight: 900; animation: logoPulse 1s infinite; }
+  .loading-bar-wrap { width: 200px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .loading-bar { height: 100%; background: linear-gradient(90deg, #FFD700, #FF8C00); border-radius: 3px; animation: loadProgress 1.5s ease forwards; }
+  @keyframes loadProgress { from { width: 0; } to { width: 100%; } }
+
+  .all-medals {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .medal-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #FFD700;
+  }
+  .medal-item .m-emoji { font-size: 28px; }
+
+  /* ===== MOBILE TOUCH IMPROVEMENTS ===== */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  html {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Touch targets minimum size on mobile */
+  @media (max-width: 480px) {
+    #hud { padding: 5px 8px; gap: 3px; }
+    .hud-item { padding: 3px 7px; font-size: 10px; gap: 2px; }
+    .hud-item .emoji { font-size: 12px; }
+    .heart { font-size: 13px; }
+    #progress-bar-wrap { max-width: 70px; }
+    #timer-display { font-size: 10px; padding: 3px 6px; }
+    .sound-btn { width: 28px; height: 28px; font-size: 13px; flex-shrink: 0; }
+    .castle-zone { height: 42%; width: 47%; }
+    #castle-sun { right: 1%; }
+    #castle-moon { left: 1%; }
+    .drop-zone { height: 36%; width: 72%; bottom: 6%; }
+    .drop-zone span { font-size: 10px !important; }
+    .castle-label { font-size: 9px; padding: 3px 10px; bottom: -10px; }
+    #guide { bottom: 10%; right: 0.5%; }
+    #guide-char { width: 44px; height: 44px; }
+    #guide-bubble { font-size: 9px; max-width: 100px; padding: 5px 9px; }
+    .word-card { font-size: 13px; padding: 7px 12px; border-radius: 12px; border-width: 2px; }
+    #shop-btn { width: 44px; height: 44px; font-size: 20px; bottom: 11%; left: 1%; }
+    .start-inner { gap: 10px; padding: 12px 10px; max-width: 100%; }
+    .king-card { padding: 10px 12px; min-width: 96px; }
+    .king-icon { font-size: 26px; }
+    .king-name { font-size: 11px; }
+    .king-letters { font-size: 9px; }
+    .btn-start { padding: 12px 32px; width: 82%; min-height: 48px; }
+    #player-name-input { font-size: 16px; padding: 10px 14px; }
+    #mini-game-area { width: 95vw; height: 46vh; }
+    .mini-game-title { font-size: 17px; margin-bottom: 8px; }
+    .treasure-box { font-size: 68px; }
+    .badge-icon { font-size: 44px; }
+    .medal-earned { font-size: 13px; margin: 8px 0; }
+    .btn-next-level { padding: 11px 26px; font-size: 14px; margin-top: 12px; }
+    #win-screen { padding: 10px; }
+    .win-trophy { font-size: 54px; }
+    .win-title { font-size: clamp(18px, 5vw, 30px); }
+    #cert-section { padding: 16px 14px; }
+    .cert-stats { gap: 10px; }
+    .btn-play-again { padding: 11px 26px; font-size: 14px; }
+    #shop-screen { padding: 10px; }
+    .shop-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 8px; }
+    .shop-emoji { font-size: 28px; }
+    .shop-name { font-size: 10px; }
+    #villain { padding: 8px; }
+    #villain-svg { width: 52px; height: 52px; }
+    .feedback-msg { font-size: clamp(18px, 4.5vw, 32px); padding: 12px 26px; }
+    #reason-box { font-size: 11px; padding: 8px 16px; bottom: 18%; }
+    .medal-item .m-emoji { font-size: 24px; }
+    .medal-item { font-size: 10px; }
+  }
+
+  @media (max-width: 360px) {
+    .word-card { font-size: 12px; padding: 6px 10px; }
+    .hud-item { padding: 2px 5px; font-size: 9px; }
+    #progress-bar-wrap { max-width: 55px; }
+    .castle-zone { height: 40%; width: 48%; }
+    .king-card { min-width: 88px; padding: 8px 10px; }
+  }
+
+  /* Landscape mobile */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .castle-zone { height: 75%; width: 35%; }
+    #guide { bottom: 2%; }
+    #guide-char { width: 34px; height: 34px; }
+    #guide-bubble { font-size: 8px; max-width: 88px; }
+    #shop-btn { bottom: 3%; width: 38px; height: 38px; font-size: 17px; }
+    .word-card { font-size: 12px; padding: 5px 10px; }
+    .hud-item { font-size: 9px; padding: 2px 6px; }
+    .start-inner { gap: 8px; padding: 8px; }
+    .kings-preview { gap: 14px; }
+  }
+
+  /* Tablet */
+  @media (min-width: 600px) and (max-width: 900px) {
+    .castle-zone { height: 50%; width: 43%; }
+    .word-card { font-size: 18px; padding: 9px 16px; }
+    #guide-char { width: 58px; height: 58px; }
+    #guide-bubble { font-size: 11px; max-width: 128px; }
+  }
+
+  /* Large desktop */
+  @media (min-width: 1200px) {
+    .castle-zone { height: 60%; }
+    #guide-char { width: 80px; height: 80px; }
+    #guide-bubble { font-size: 14px; max-width: 170px; }
+  }
+
+  /* Prevent word cards overflow */
+  .word-card { max-width: 45vw; word-break: keep-all; white-space: nowrap; }
+
+  /* Better button tap target */
+  .btn-start, .btn-next-level, .btn-close-shop, .btn-play-again, .btn-print {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Remove double-tap zoom on buttons */
+  button, .word-card, .shop-item, .mini-target, #villain {
+    touch-action: manipulation;
+  }
+  .word-card { touch-action: none; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #cert-section, #cert-section * { visibility: visible; }
+    #cert-section { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="fireworks-canvas"></canvas>
+
+<div id="loading-screen">
+  <div class="loading-title">مملكة اللام السحرية ✨</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div style="color:#87CEEB;font-size:13px;">جار التحميل...</div>
+</div>
+
+<div id="particles-overlay"></div>
+<div id="feedback-overlay">
+  <div class="feedback-msg feedback-correct" id="fb-correct">🌟 ممتاز!</div>
+  <div class="feedback-msg feedback-wrong" id="fb-wrong">حاول مرة أخرى!</div>
+</div>
+<div id="reason-box"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-group">
+    <div class="hud-item"><span class="emoji">⭐</span><span id="hud-stars">0</span></div>
+    <div class="hud-item"><span class="emoji">🎯</span><span id="hud-score">0</span></div>
+    <div class="hud-item"><span class="emoji">📝</span><span id="hud-words">0</span></div>
+  </div>
+  <div class="hud-group" style="flex:1;justify-content:center;flex-direction:column;gap:3px;align-items:center;">
+    <div style="font-size:10px;color:#87CEEB;">المرحلة <span id="hud-level">1</span>/3</div>
+    <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+  </div>
+  <div class="hud-group">
+    <div id="timer-display">⏱ --</div>
+    <div class="lives-display" id="lives-display"></div>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔊</button>
+  </div>
+</div>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="screen active">
+  <div class="start-inner">
+    <div class="game-logo">🏰 مملكة اللام السحرية 🏰</div>
+    <div class="subtitle">مغامرة تعليمية رائعة في عالم اللغة العربية</div>
+
+    <div class="student-card">
+      <p>إعداد المعلمة:</p>
+      <p class="sname">آمنة عبد محمد عمري</p>
+      <p class="sschool">المشاريع الأساسية المختلطة</p>
+    </div>
+
+    <div class="kings-preview">
+      <div class="king-card king-sun">
+        <div class="king-icon">☀️</div>
+        <div class="king-name">ملك اللام الشمسية</div>
+        <div class="king-letters">ت ث د ذ ر ز<br>س ش ص ض<br>ط ظ ل ن</div>
+      </div>
+      <div class="king-card king-moon">
+        <div class="king-icon">🌙</div>
+        <div class="king-name">ملك اللام القمرية</div>
+        <div class="king-letters">أ ب ج ح خ<br>ع غ ف ق<br>ك م و ه ي</div>
+      </div>
+    </div>
+
+    <div class="name-input-wrap">
+      <label for="player-name-input">✏️ أدخل اسمك يا بطل:</label>
+      <input type="text" id="player-name-input" placeholder="اسمك هنا..." maxlength="30" />
+    </div>
+
+    <button class="btn-start" onclick="startGame()">🚀 ابدأ المغامرة!</button>
+
+    <div style="color:rgba(255,255,255,0.5);font-size:11px;text-align:center;">
+      اسحب الكلمات إلى القصر الصحيح وأنقذ المملكة!
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div id="game-area">
+    <!-- Sun Castle -->
+    <div class="castle-zone" id="castle-sun">
+      <svg class="castle-svg" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sunWall" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFD700"/>
+            <stop offset="50%" style="stop-color:#FFA500"/>
+            <stop offset="100%" style="stop-color:#B8860B"/>
+          </linearGradient>
+          <linearGradient id="sunRoof" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#FF8C00"/>
+            <stop offset="100%" style="stop-color:#B8860B"/>
+          </linearGradient>
+          <filter id="sunGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Battlements top -->
+        <rect x="20" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="60" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="100" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="140" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="180" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="220" y="40" width="30" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <rect x="260" y="40" width="20" height="30" rx="3" fill="url(#sunWall)" filter="url(#sunGlow)"/>
+        <!-- Main wall -->
+        <rect x="10" y="70" width="280" height="270" rx="8" fill="url(#sunWall)"/>
+        <!-- Shadow on wall -->
+        <rect x="10" y="70" width="280" height="270" rx="8" fill="url(#sunRoof)" opacity="0.3"/>
+        <!-- Windows -->
+        <rect x="30" y="110" width="50" height="60" rx="25" fill="#FF6600" opacity="0.7"/>
+        <rect x="220" y="110" width="50" height="60" rx="25" fill="#FF6600" opacity="0.7"/>
+        <rect x="125" y="100" width="50" height="70" rx="25" fill="#FF4500" opacity="0.8"/>
+        <!-- Arch door -->
+        <rect x="105" y="220" width="90" height="120" rx="45" fill="#7B3F00"/>
+        <rect x="115" y="240" width="70" height="100" rx="35" fill="#5C2E00"/>
+        <!-- Stars deco -->
+        <text x="50" y="175" font-size="20" fill="#FFF8DC" opacity="0.9">★</text>
+        <text x="225" y="175" font-size="20" fill="#FFF8DC" opacity="0.9">★</text>
+        <text x="140" y="95" font-size="16" fill="#FFF8DC" opacity="0.8">☀</text>
+        <!-- Flag tower -->
+        <rect x="130" y="0" width="12" height="48" fill="#B8860B"/>
+        <polygon points="142,0 178,16 142,32" fill="#FF4500"/>
+        <!-- Glow base -->
+        <ellipse cx="150" cy="340" rx="120" ry="12" fill="rgba(255,165,0,0.3)"/>
+      </svg>
+      <div class="drop-zone" id="drop-sun">
+        <span style="color:rgba(255,215,0,0.5);font-size:clamp(12px,2.5vw,18px);font-weight:700;">☀️ اللام الشمسية</span>
+      </div>
+      <div class="castle-label">القصر الذهبي ☀️</div>
+    </div>
+
+    <!-- Moon Castle -->
+    <div class="castle-zone" id="castle-moon">
+      <svg class="castle-svg" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="moonWall" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#E8E8F8"/>
+            <stop offset="50%" style="stop-color:#B0C4DE"/>
+            <stop offset="100%" style="stop-color:#708090"/>
+          </linearGradient>
+          <linearGradient id="moonRoof" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#4169E1"/>
+            <stop offset="100%" style="stop-color:#191970"/>
+          </linearGradient>
+          <filter id="moonGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Battlements top -->
+        <rect x="20" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="60" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="100" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="140" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="180" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="220" y="40" width="30" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <rect x="260" y="40" width="20" height="30" rx="3" fill="url(#moonWall)" filter="url(#moonGlow)"/>
+        <!-- Main wall -->
+        <rect x="10" y="70" width="280" height="270" rx="8" fill="url(#moonWall)"/>
+        <rect x="10" y="70" width="280" height="270" rx="8" fill="url(#moonRoof)" opacity="0.25"/>
+        <!-- Windows -->
+        <rect x="30" y="110" width="50" height="60" rx="25" fill="#4169E1" opacity="0.7"/>
+        <rect x="220" y="110" width="50" height="60" rx="25" fill="#4169E1" opacity="0.7"/>
+        <rect x="125" y="100" width="50" height="70" rx="25" fill="#1E3A8A" opacity="0.8"/>
+        <!-- Arch door -->
+        <rect x="105" y="220" width="90" height="120" rx="45" fill="#1a237e"/>
+        <rect x="115" y="240" width="70" height="100" rx="35" fill="#0d1b6b"/>
+        <!-- Moon deco -->
+        <text x="48" y="175" font-size="18" fill="#4169E1" opacity="0.9">★</text>
+        <text x="225" y="175" font-size="18" fill="#4169E1" opacity="0.9">★</text>
+        <text x="140" y="95" font-size="16" fill="#87CEEB" opacity="0.9">☽</text>
+        <!-- Flag tower -->
+        <rect x="130" y="0" width="12" height="48" fill="#708090"/>
+        <polygon points="142,0 178,16 142,32" fill="#4169E1"/>
+        <!-- Glow base -->
+        <ellipse cx="150" cy="340" rx="120" ry="12" fill="rgba(65,105,225,0.3)"/>
+      </svg>
+      <div class="drop-zone" id="drop-moon">
+        <span style="color:rgba(135,206,235,0.5);font-size:clamp(12px,2.5vw,18px);font-weight:700;">🌙 اللام القمرية</span>
+      </div>
+      <div class="castle-label">القصر الفضي 🌙</div>
+    </div>
+
+    <!-- Villain -->
+    <div id="villain" onclick="hitVillain()" ontouchstart="event.preventDefault(); hitVillain();">
+      <svg id="villain-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="30" r="25" fill="#6B0000"/>
+        <circle cx="30" cy="24" r="5" fill="#FF0000"/>
+        <circle cx="50" cy="24" r="5" fill="#FF0000"/>
+        <circle cx="30" cy="24" r="2.5" fill="#fff"/>
+        <circle cx="50" cy="24" r="2.5" fill="#fff"/>
+        <path d="M28 38 Q40 46 52 38" stroke="#FF6600" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M15 10 L25 22" stroke="#FF6600" stroke-width="3" stroke-linecap="round"/>
+        <path d="M65 10 L55 22" stroke="#FF6600" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="40" cy="60" rx="18" ry="15" fill="#6B0000"/>
+        <text x="27" y="68" font-size="14" fill="#FF0000">😈</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE -->
+<div id="guide">
+  <div id="guide-bubble"></div>
+  <svg id="guide-char" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="105" rx="25" ry="8" fill="rgba(0,230,118,0.2)"/>
+    <circle cx="50" cy="55" r="30" fill="#FF69B4"/>
+    <circle cx="50" cy="55" r="28" fill="#FF85C2"/>
+    <circle cx="38" cy="47" r="6" fill="#fff"/>
+    <circle cx="62" cy="47" r="6" fill="#fff"/>
+    <circle cx="39" cy="48" r="3.5" fill="#1a0533"/>
+    <circle cx="63" cy="48" r="3.5" fill="#1a0533"/>
+    <circle cx="40" cy="47" r="1.5" fill="#fff"/>
+    <circle cx="64" cy="47" r="1.5" fill="#fff"/>
+    <path d="M38 64 Q50 72 62 64" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="90" rx="22" ry="26" fill="#9C27B0"/>
+    <path d="M28 78 Q18 90 22 105" stroke="#9C27B0" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <path d="M72 78 Q82 90 78 105" stroke="#9C27B0" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <polygon points="50,25 53,18 56,25" fill="#FFD700"/>
+    <circle cx="50" cy="16" r="6" fill="#FFD700"/>
+  </svg>
+</div>
+
+<!-- Shop button -->
+<button id="shop-btn" onclick="openShop()">🛒</button>
+
+<!-- LEVEL UP SCREEN -->
+<div id="level-screen" class="screen">
+  <div class="treasure-box" id="treasure-emoji">🎁</div>
+  <div class="medal-earned" id="medal-text"></div>
+  <div class="badge-icon" id="badge-icon"></div>
+  <div style="color:#87CEEB;font-size:14px;text-align:center;margin:8px 0;padding:0 20px;" id="level-msg"></div>
+  <div class="all-medals" id="all-medals-display"></div>
+  <button class="btn-next-level" id="next-level-btn" onclick="nextLevel()">▶ المرحلة التالية</button>
+</div>
+
+<!-- MINI GAME SCREEN -->
+<div id="mini-game-screen" class="screen">
+  <div class="mini-game-title" id="mini-game-title">🌟 اصطد النجوم!</div>
+  <div id="mini-timer-bar"></div>
+  <div id="mini-game-area"></div>
+  <div class="mini-score-display">النقاط: <span id="mini-score">0</span></div>
+</div>
+
+<!-- SHOP SCREEN -->
+<div id="shop-screen" class="screen">
+  <div class="shop-title">🛒 متجر المكافآت</div>
+  <div style="color:#87CEEB;font-size:13px;margin-bottom:12px;">نجومك: ⭐ <span id="shop-stars-display" style="color:#FFD700;font-weight:700;">0</span></div>
+  <div class="shop-grid" id="shop-grid"></div>
+  <button class="btn-close-shop" onclick="closeShop()">✅ حسناً</button>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="win-screen" class="screen">
+  <div class="win-trophy">🏆</div>
+  <div class="win-title">مبروك يا بطل!</div>
+  <div style="color:#87CEEB;font-size:14px;text-align:center;margin-bottom:12px;">لقد أنقذت مملكة اللام السحرية!</div>
+
+  <div class="all-medals" id="win-medals"></div>
+
+  <div id="cert-section">
+    <div class="cert-ornament">✦ ✦ ✦ ✦ ✦</div>
+    <div class="cert-title">شهادة إنجاز</div>
+    <div class="cert-game-name">مملكة اللام السحرية</div>
+    <div style="font-size:12px;color:#888;margin-bottom:6px;">إعداد الطالبة: <strong>آمنة عبد محمد عمري</strong></div>
+    <div style="font-size:11px;color:#999;margin-bottom:12px;">المشاريع الأساسية المختلطة</div>
+    <div class="cert-player-label">يُقدَّم بفخر إلى</div>
+    <div class="cert-player-name" id="cert-player-name">—</div>
+    <div class="cert-stats">
+      <div class="cert-stat"><span id="cert-score">0</span>نقطة</div>
+      <div class="cert-stat"><span id="cert-stars">0</span>نجمة</div>
+      <div class="cert-stat"><span id="cert-words">0</span>كلمة</div>
+    </div>
+    <div class="cert-msg">
+      نبارك لك إتمام مغامرة اللام الشمسية واللام القمرية بنجاح،<br>
+      ونتمنى لك المزيد من التميز والإبداع.
+    </div>
+    <div class="cert-date" id="cert-date"></div>
+    <div class="cert-ornament" style="margin-top:10px;">✦ ✦ ✦ ✦ ✦</div>
+    <button class="btn-print" onclick="printCert()">🖨️ طباعة الشهادة</button>
+  </div>
+
+  <button class="btn-play-again" onclick="location.reload()">🔄 العب مرة أخرى!</button>
+</div>
+
+<script>
+const SUN_LETTERS = ['ت','ث','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ل','ن'];
+const MOON_LETTERS = ['أ','ا','ب','ج','ح','خ','ع','غ','ف','ق','ك','م','و','ه','ي'];
+
+const WORDS_BY_LEVEL = [
+  [
+    {word:'الشمس',type:'sun'},{word:'النجوم',type:'sun'},{word:'الليل',type:'sun'},
+    {word:'الدرس',type:'sun'},{word:'الطيور',type:'sun'},{word:'الزهور',type:'sun'},
+    {word:'القمر',type:'moon'},{word:'الكتاب',type:'moon'},{word:'البيت',type:'moon'},
+    {word:'المدرسة',type:'moon'},{word:'الولد',type:'moon'},{word:'البنت',type:'moon'},
+    {word:'الثمار',type:'sun'},{word:'الحديقة',type:'moon'},{word:'الأسد',type:'moon'},
+    {word:'الفيل',type:'moon'},{word:'الرجل',type:'sun'},{word:'الجبل',type:'moon'},
+  ],
+  [
+    {word:'الصديق',type:'sun'},{word:'الذهب',type:'sun'},{word:'الضيف',type:'sun'},
+    {word:'الطالب',type:'sun'},{word:'الظبي',type:'sun'},{word:'النهر',type:'sun'},
+    {word:'العصفور',type:'moon'},{word:'الغابة',type:'moon'},{word:'الفراشة',type:'moon'},
+    {word:'القبة',type:'moon'},{word:'الكوكب',type:'moon'},{word:'الهلال',type:'moon'},
+    {word:'الريح',type:'sun'},{word:'الأمل',type:'moon'},{word:'الخير',type:'moon'},
+    {word:'السماء',type:'sun'},{word:'المسجد',type:'moon'},{word:'الوردة',type:'moon'},
+  ],
+  [
+    {word:'الزرافة',type:'sun'},{word:'الرياضة',type:'sun'},{word:'الدولة',type:'sun'},
+    {word:'الشجرة',type:'sun'},{word:'الصورة',type:'sun'},{word:'الطاولة',type:'sun'},
+    {word:'الأسرة',type:'moon'},{word:'البركة',type:'moon'},{word:'الجامعة',type:'moon'},
+    {word:'الحضارة',type:'moon'},{word:'العقل',type:'moon'},{word:'الميزان',type:'moon'},
+    {word:'الظلام',type:'sun'},{word:'النخلة',type:'sun'},{word:'القيمة',type:'moon'},
+    {word:'الكرامة',type:'moon'},{word:'الهدية',type:'moon'},{word:'الإنسان',type:'moon'},
+  ]
+];
+
+const BADGES = [
+  {name:'وسام البطل الصغير', emoji:'🥉'},
+  {name:'وسام فارس اللغة', emoji:'🥈'},
+  {name:'وسام سيد اللام', emoji:'🥇'},
+  {name:'وسام بطل المملكة', emoji:'🏆'},
+];
+
+const GUIDE_MSGS = [
+  'مرحباً يا بطل! 👋','لننقذ المملكة! 🏰','أحسنت! 🌟','رائع جداً! ✨',
+  'أنت ذكي جداً! 🧠','بقي القليل! 💪','هيا نكمل! 🚀','ممتاز! 🎉',
+  'أنت الأفضل! 👑','استمر! 💫',
+];
+
+const SHOP_ITEMS = [
+  {id:'hat1',name:'قبعة المحقق',emoji:'🎩',price:15,type:'hat'},
+  {id:'hat2',name:'قبعة السحر',emoji:'🎓',price:20,type:'hat'},
+  {id:'crown1',name:'تاج الملك',emoji:'👑',price:30,type:'crown'},
+  {id:'crown2',name:'تاج الأمير',emoji:'💎',price:25,type:'crown'},
+  {id:'color1',name:'لون الذهب',emoji:'🌟',price:10,type:'color'},
+  {id:'color2',name:'لون الفضة',emoji:'❄️',price:10,type:'color'},
+  {id:'bg1',name:'خلفية الفضاء',emoji:'🚀',price:40,type:'bg'},
+  {id:'bg2',name:'خلفية الغابة',emoji:'🌲',price:40,type:'bg'},
+  {id:'char1',name:'شخصية الأسد',emoji:'🦁',price:50,type:'char'},
+  {id:'char2',name:'شخصية الفيل',emoji:'🐘',price:50,type:'char'},
+  {id:'bubble1',name:'فقاعات قلب',emoji:'💝',price:15,type:'bubble'},
+  {id:'bubble2',name:'فقاعات نجوم',emoji:'💫',price:15,type:'bubble'},
+];
+
+const MINI_GAMES = [
+  {title:'🌟 اصطد النجوم! (10 ثوانٍ)', type:'stars'},
+  {title:'🎈 افقع البالونات! (10 ثوانٍ)', type:'balloons'},
+  {title:'🦋 امسك الفراشات! (10 ثوانٍ)', type:'butterflies'},
+  {title:'🪙 اجمع العملات! (10 ثوانٍ)', type:'coins'},
+];
+
+let state = {
+  playerName: '',
+  score: 0,
+  stars: 0,
+  level: 1,
+  lives: 3,
+  words: 0,
+  correctStreak: 0,
+  totalCorrect: 0,
+  badges: [],
+  ownedItems: [],
+  equippedItems: {},
+  soundOn: true,
+  timerInterval: null,
+  timeLeft: 30,
+  levelWordsDone: 0,
+  levelWordsTarget: 8,
+  currentWords: [],
+  fallingIntervals: [],
+  villainTimeout: null,
+  phase: 'game',
+  miniScore: 0,
+};
+
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  // Resume suspended context (needed after iOS user interaction)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  return audioCtx;
+}
+
+// Unlock audio on first user touch (iOS requirement)
+document.addEventListener('touchstart', function unlockAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  document.removeEventListener('touchstart', unlockAudio);
+}, { once: true });
+
+function playTone(freq, type, duration, vol) {
+  if (!state.soundOn) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol || 0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playCorrect() {
+  playTone(523, 'sine', 0.15, 0.4);
+  setTimeout(() => playTone(659, 'sine', 0.15, 0.4), 100);
+  setTimeout(() => playTone(784, 'sine', 0.25, 0.4), 200);
+}
+
+function playWrong() {
+  playTone(200, 'sawtooth', 0.3, 0.3);
+  setTimeout(() => playTone(150, 'sawtooth', 0.3, 0.3), 150);
+}
+
+function playPickup() { playTone(440, 'sine', 0.1, 0.2); }
+function playDrop() { playTone(330, 'sine', 0.12, 0.2); }
+function playVillain() { playTone(100, 'sawtooth', 0.2, 0.4); }
+function playLevelUp() {
+  [523,659,784,1047].forEach((f,i) => setTimeout(() => playTone(f,'sine',0.3,0.4), i*120));
+}
+function playStar() { playTone(880, 'sine', 0.15, 0.3); }
+
+function toggleSound() {
+  state.soundOn = !state.soundOn;
+  document.getElementById('sound-btn').textContent = state.soundOn ? '🔊' : '🔇';
+}
+
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+let bgObjects = [];
+let bgAnimFrame;
+
+function initBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  bgObjects = [];
+
+  const isMobile = window.innerWidth < 600;
+  for (let i = 0; i < (isMobile ? 40 : 80); i++) {
+    bgObjects.push({
+      type: 'star',
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height * 0.7,
+      r: Math.random() * 2 + 0.5,
+      alpha: Math.random(),
+      speed: Math.random() * 0.02 + 0.005,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
+  for (let i = 0; i < (isMobile ? 3 : 5); i++) {
+    bgObjects.push({
+      type: 'cloud',
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height * 0.4 + 60,
+      w: Math.random() * 120 + 80,
+      speed: Math.random() * 0.3 + 0.1,
+    });
+  }
+
+  for (let i = 0; i < (isMobile ? 4 : 8); i++) {
+    bgObjects.push({
+      type: 'bird',
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height * 0.3 + 60,
+      speed: Math.random() * 0.8 + 0.3,
+      flapPhase: Math.random() * Math.PI * 2,
+      size: Math.random() * 8 + 6,
+    });
+  }
+
+  for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+    bgObjects.push({
+      type: 'butterfly',
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height * 0.5 + 100,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: (Math.random() - 0.5) * 0.5,
+      phase: Math.random() * Math.PI * 2,
+      color: ['#FF69B4','#FFD700','#87CEEB','#98FB98','#DDA0DD'][i % 5],
+    });
+  }
+
+  bgObjects.push({ type: 'sun', x: bgCanvas.width * 0.15, y: 80, angle: 0 });
+
+  for (let i = 0; i < (isMobile ? 2 : 4); i++) {
+    bgObjects.push({
+      type: 'tree',
+      x: (i + 0.5) * bgCanvas.width / 4,
+      y: bgCanvas.height,
+      sway: 0,
+      swaySpeed: Math.random() * 0.03 + 0.01,
+      swayPhase: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+function drawBg(t) {
+  const W = bgCanvas.width;
+  const H = bgCanvas.height;
+
+  const grad = bgCtx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0a0020');
+  grad.addColorStop(0.4, '#1a0533');
+  grad.addColorStop(0.7, '#0d1b4b');
+  grad.addColorStop(1, '#1a3a1a');
+  bgCtx.fillStyle = grad;
+  bgCtx.fillRect(0, 0, W, H);
+
+  const groundGrad = bgCtx.createLinearGradient(0, H * 0.75, 0, H);
+  groundGrad.addColorStop(0, '#1a3a0a');
+  groundGrad.addColorStop(1, '#0a1a00');
+  bgCtx.fillStyle = groundGrad;
+  bgCtx.fillRect(0, H * 0.75, W, H * 0.25);
+
+  bgObjects.forEach(obj => {
+    if (obj.type === 'star') {
+      obj.alpha = 0.4 + 0.6 * Math.abs(Math.sin(t * obj.speed + obj.phase));
+      bgCtx.beginPath();
+      bgCtx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2);
+      bgCtx.fillStyle = `rgba(255,255,255,${obj.alpha})`;
+      bgCtx.fill();
+    }
+
+    if (obj.type === 'cloud') {
+      obj.x += obj.speed * 0.3;
+      if (obj.x > W + obj.w) obj.x = -obj.w;
+      bgCtx.save();
+      bgCtx.globalAlpha = 0.15;
+      bgCtx.fillStyle = '#ffffff';
+      bgCtx.beginPath();
+      bgCtx.arc(obj.x, obj.y, obj.w * 0.3, 0, Math.PI * 2);
+      bgCtx.arc(obj.x + obj.w * 0.25, obj.y - obj.w * 0.08, obj.w * 0.22, 0, Math.PI * 2);
+      bgCtx.arc(obj.x + obj.w * 0.5, obj.y, obj.w * 0.28, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
+    }
+
+    if (obj.type === 'sun') {
+      obj.angle += 0.003;
+      bgCtx.save();
+      bgCtx.translate(obj.x, obj.y);
+      const sunGrad = bgCtx.createRadialGradient(0, 0, 10, 0, 0, 40);
+      sunGrad.addColorStop(0, 'rgba(255,255,150,0.8)');
+      sunGrad.addColorStop(0.5, 'rgba(255,165,0,0.4)');
+      sunGrad.addColorStop(1, 'rgba(255,100,0,0)');
+      bgCtx.fillStyle = sunGrad;
+      bgCtx.beginPath();
+      bgCtx.arc(0, 0, 40, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.strokeStyle = 'rgba(255,200,0,0.5)';
+      bgCtx.lineWidth = 2;
+      for (let r = 0; r < 8; r++) {
+        const a = obj.angle + r * Math.PI / 4;
+        bgCtx.beginPath();
+        bgCtx.moveTo(Math.cos(a) * 26, Math.sin(a) * 26);
+        bgCtx.lineTo(Math.cos(a) * 38, Math.sin(a) * 38);
+        bgCtx.stroke();
+      }
+      bgCtx.restore();
+    }
+
+    if (obj.type === 'bird') {
+      obj.x += obj.speed;
+      if (obj.x > W + 30) obj.x = -30;
+      obj.flapPhase += 0.15;
+      const flap = Math.sin(obj.flapPhase) * 5;
+      bgCtx.save();
+      bgCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+      bgCtx.lineWidth = 1.5;
+      bgCtx.beginPath();
+      bgCtx.moveTo(obj.x - obj.size, obj.y + flap);
+      bgCtx.quadraticCurveTo(obj.x, obj.y, obj.x + obj.size, obj.y + flap);
+      bgCtx.stroke();
+      bgCtx.restore();
+    }
+
+    if (obj.type === 'butterfly') {
+      obj.x += obj.vx + Math.sin(t * 0.03 + obj.phase) * 0.4;
+      obj.y += obj.vy + Math.cos(t * 0.04 + obj.phase) * 0.3;
+      if (obj.x < 0) { obj.x = 0; obj.vx *= -1; }
+      if (obj.x > W) { obj.x = W; obj.vx *= -1; }
+      if (obj.y < H * 0.1) { obj.y = H * 0.1; obj.vy *= -1; }
+      if (obj.y > H * 0.65) { obj.y = H * 0.65; obj.vy *= -1; }
+      obj.phase += 0.08;
+      const wing = Math.abs(Math.sin(obj.phase)) * 8;
+      bgCtx.save();
+      bgCtx.globalAlpha = 0.5;
+      bgCtx.fillStyle = obj.color;
+      bgCtx.beginPath();
+      bgCtx.ellipse(obj.x - wing, obj.y, wing, 5, -Math.PI / 6, 0, Math.PI * 2);
+      bgCtx.ellipse(obj.x + wing, obj.y, wing, 5, Math.PI / 6, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
+    }
+
+    if (obj.type === 'tree') {
+      obj.swayPhase += obj.swaySpeed;
+      obj.sway = Math.sin(obj.swayPhase) * 3;
+      const tx = obj.x, ty = obj.y;
+      bgCtx.save();
+      bgCtx.strokeStyle = '#4a2800';
+      bgCtx.lineWidth = 6;
+      bgCtx.beginPath();
+      bgCtx.moveTo(tx, ty);
+      bgCtx.quadraticCurveTo(tx + obj.sway, ty - 40, tx + obj.sway * 1.5, ty - 80);
+      bgCtx.stroke();
+      const treeGrad = bgCtx.createRadialGradient(tx + obj.sway, ty - 100, 5, tx + obj.sway, ty - 100, 35);
+      treeGrad.addColorStop(0, 'rgba(0,180,0,0.7)');
+      treeGrad.addColorStop(1, 'rgba(0,100,0,0.3)');
+      bgCtx.fillStyle = treeGrad;
+      bgCtx.beginPath();
+      bgCtx.arc(tx + obj.sway, ty - 100, 35, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
+    }
+  });
+
+  bgAnimFrame = requestAnimationFrame(() => drawBg(t + 1));
+}
+
+const fwCanvas = document.getElementById('fireworks-canvas');
+const fwCtx = fwCanvas.getContext('2d');
+let fwParticles = [];
+let fwRunning = false;
+let fwFrame;
+
+function startFireworks() {
+  fwCanvas.style.display = 'block';
+  fwCanvas.width = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+  fwRunning = true;
+  fwParticles = [];
+  animFireworks();
+  const fwInterval = setInterval(() => {
+    if (!fwRunning) { clearInterval(fwInterval); return; }
+    spawnFirework();
+  }, 600);
+  setTimeout(() => {
+    fwRunning = false;
+    fwCanvas.style.display = 'none';
+    clearInterval(fwInterval);
+  }, 8000);
+}
+
+function spawnFirework() {
+  const x = Math.random() * fwCanvas.width;
+  const y = Math.random() * fwCanvas.height * 0.6;
+  const colors = ['#FFD700','#FF69B4','#87CEEB','#00E676','#FF4466','#DDA0DD','#FFA500'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const fwCount = window.innerWidth < 600 ? 20 : 40;
+  for (let i = 0; i < fwCount; i++) {
+    const angle = (i / 40) * Math.PI * 2;
+    const speed = Math.random() * 4 + 2;
+    fwParticles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color,
+      alpha: 1,
+      r: Math.random() * 4 + 2,
+      life: 1,
+    });
+  }
+}
+
+function animFireworks() {
+  if (!fwRunning) return;
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwParticles = fwParticles.filter(p => p.alpha > 0.01);
+  fwParticles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.1;
+    p.alpha *= 0.96;
+    p.life *= 0.97;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    fwCtx.fillStyle = p.color + Math.floor(p.alpha * 255).toString(16).padStart(2,'0');
+    fwCtx.fill();
+  });
+  fwFrame = requestAnimationFrame(animFireworks);
+}
+
+function spawnParticles(x, y, count, colors) {
+  const overlay = document.getElementById('particles-overlay');
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = i % 4 === 0 ? 'star-particle' : 'particle';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 120 + 40;
+    const px = Math.cos(angle) * dist;
+    const py = Math.sin(angle) * dist - 60;
+    el.style.setProperty('--px', px + 'px');
+    el.style.setProperty('--py', py + 'px');
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    if (el.className.includes('star')) {
+      el.textContent = ['⭐','✨','💫','🌟','★'][Math.floor(Math.random() * 5)];
+    } else {
+      const color = colors ? colors[Math.floor(Math.random() * colors.length)] : '#FFD700';
+      el.style.width = (Math.random() * 10 + 5) + 'px';
+      el.style.height = el.style.width;
+      el.style.background = color;
+    }
+    overlay.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  }
+}
+
+function showFeedback(type, x, y) {
+  const el = document.getElementById(type === 'correct' ? 'fb-correct' : 'fb-wrong');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1200);
+}
+
+function showGuide(msg) {
+  const bubble = document.getElementById('guide-bubble');
+  bubble.textContent = msg;
+  bubble.classList.add('show');
+  setTimeout(() => bubble.classList.remove('show'), 2500);
+}
+
+function showReason(msg) {
+  const box = document.getElementById('reason-box');
+  box.textContent = msg;
+  box.classList.remove('show');
+  void box.offsetWidth;
+  box.classList.add('show');
+  setTimeout(() => box.classList.remove('show'), 2600);
+}
+
+function getLetter(word) {
+  const stripped = word.replace('ال', '');
+  return stripped[0];
+}
+
+function getType(word) {
+  const first = getLetter(word);
+  if (SUN_LETTERS.includes(first)) return 'sun';
+  if (MOON_LETTERS.includes(first)) return 'moon';
+  return 'moon';
+}
+
+function getReasonText(word, type) {
+  const first = getLetter(word);
+  if (type === 'sun') {
+    return `كلمة "${word}" لامها شمسية لأن الحرف التالي هو "${first}" وهو من حروف اللام الشمسية`;
+  } else {
+    return `كلمة "${word}" لامها قمرية لأن الحرف التالي هو "${first}" وهو من حروف اللام القمرية`;
+  }
+}
+
+function updateHUD() {
+  document.getElementById('hud-stars').textContent = state.stars;
+  document.getElementById('hud-score').textContent = state.score;
+  document.getElementById('hud-words').textContent = state.words;
+  document.getElementById('hud-level').textContent = state.level;
+  const pct = (state.levelWordsDone / state.levelWordsTarget) * 100;
+  document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('shop-stars-display').textContent = state.stars;
+  renderLives();
+}
+
+function renderLives() {
+  const container = document.getElementById('lives-display');
+  container.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart' + (i >= state.lives ? ' lost' : '');
+    h.textContent = '❤️';
+    container.appendChild(h);
+  }
+}
+
+let wordElements = [];
+
+function spawnWord() {
+  const pool = WORDS_BY_LEVEL[state.level - 1];
+  const wordData = pool[Math.floor(Math.random() * pool.length)];
+  const gameArea = document.getElementById('game-area');
+
+  const el = document.createElement('div');
+  el.className = 'word-card';
+  el.textContent = wordData.word;
+  el.dataset.word = wordData.word;
+  el.dataset.type = wordData.type;
+
+  const colors = [
+    ['rgba(255,100,100,0.3)', 'rgba(255,150,50,0.3)'],
+    ['rgba(100,180,255,0.3)', 'rgba(150,100,255,0.3)'],
+    ['rgba(100,255,180,0.3)', 'rgba(100,200,255,0.3)'],
+    ['rgba(255,200,100,0.3)', 'rgba(255,150,200,0.3)'],
+  ];
+  const c = colors[Math.floor(Math.random() * colors.length)];
+  el.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
+
+  const gameW = gameArea.offsetWidth;
+  const cardWidth = Math.min(140, gameW * 0.35);
+  const xPos = Math.max(10, Math.random() * (gameW - cardWidth - 20) + 10);
+  el.style.left = xPos + 'px';
+  el.style.top = '-80px';
+  gameArea.appendChild(el);
+
+  let y = -80;
+  const speed = 0.5 + (state.level - 1) * 0.4;
+  let falling = true;
+  let isDragging = false;
+  let dragOffsetX = 0, dragOffsetY = 0;
+  let startX = 0, startY = 0;
+
+  const fallInterval = setInterval(() => {
+    if (!falling || isDragging) return;
+    y += speed;
+    el.style.top = y + 'px';
+    if (y > window.innerHeight) {
+      clearInterval(fallInterval);
+      el.remove();
+      wordElements = wordElements.filter(w => w.el !== el);
+      if (state.lives > 0) {
+        state.lives = Math.max(0, state.lives - 1);
+        updateHUD();
+        if (state.lives === 0) gameOver();
+      }
+    }
+  }, 16);
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDragging = true;
+    falling = false;
+    el.classList.add('dragging');
+    playPickup();
+    const rect = el.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : (e.clientX !== undefined ? e.clientX : e.changedTouches[0].clientX);
+    const clientY = e.touches ? e.touches[0].clientY : (e.clientY !== undefined ? e.clientY : e.changedTouches[0].clientY);
+    dragOffsetX = clientX - rect.left;
+    dragOffsetY = clientY - rect.top;
+    startX = clientX;
+    startY = clientY;
+    el.style.transition = 'none';
+    el.style.zIndex = '200';
+    document.addEventListener('pointermove', onPointerMove, { passive: false });
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('touchmove', onPointerMove, { passive: false });
+    document.addEventListener('touchend', onPointerUp, { passive: false });
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const elW = el.offsetWidth || 120;
+    const elH = el.offsetHeight || 50;
+    const clampedX = Math.max(0, Math.min(window.innerWidth - elW, clientX - dragOffsetX));
+    const clampedY = Math.max(0, Math.min(window.innerHeight - elH, clientY - dragOffsetY));
+    el.style.left = clampedX + 'px';
+    el.style.top = clampedY + 'px';
+
+    const dropSun = document.getElementById('drop-sun');
+    const dropMoon = document.getElementById('drop-moon');
+    const sunRect = dropSun.getBoundingClientRect();
+    const moonRect = dropMoon.getBoundingClientRect();
+    const inSun = clientX > sunRect.left && clientX < sunRect.right && clientY > sunRect.top && clientY < sunRect.bottom;
+    const inMoon = clientX > moonRect.left && clientX < moonRect.right && clientY > moonRect.top && clientY < moonRect.bottom;
+    dropSun.classList.toggle('drag-over-sun', inSun);
+    dropMoon.classList.toggle('drag-over-moon', inMoon);
+  }
+
+  function onPointerUp(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    el.classList.remove('dragging');
+    document.getElementById('drop-sun').classList.remove('drag-over-sun');
+    document.getElementById('drop-moon').classList.remove('drag-over-moon');
+
+    const clientX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : (e.clientX !== undefined ? e.clientX : 0);
+    const clientY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : (e.clientY !== undefined ? e.clientY : 0);
+    const dropSun = document.getElementById('drop-sun');
+    const dropMoon = document.getElementById('drop-moon');
+    const sunRect = dropSun.getBoundingClientRect();
+    const moonRect = dropMoon.getBoundingClientRect();
+    const inSun = clientX > sunRect.left && clientX < sunRect.right && clientY > sunRect.top && clientY < sunRect.bottom;
+    const inMoon = clientX > moonRect.left && clientX < moonRect.right && clientY > moonRect.top && clientY < moonRect.bottom;
+
+    const wordType = el.dataset.type;
+    playDrop();
+
+    if (inSun) {
+      handleDrop(el, 'sun', wordType, clientX, clientY, y, clearInterval.bind(null, fallInterval));
+    } else if (inMoon) {
+      handleDrop(el, 'moon', wordType, clientX, clientY, y, clearInterval.bind(null, fallInterval));
+    } else {
+      falling = true;
+      el.style.transition = '';
+    }
+
+    el.style.zIndex = '50';
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('touchmove', onPointerMove);
+    document.removeEventListener('touchend', onPointerUp);
+  }
+
+  el.addEventListener('pointerdown', onPointerDown);
+  el.addEventListener('touchstart', onPointerDown, { passive: false });
+
+  wordElements.push({ el, fallInterval });
+}
+
+function handleDrop(el, droppedZone, wordType, cx, cy, elY, stopFall) {
+  stopFall();
+  if (droppedZone === wordType) {
+    el.classList.add('correct-anim');
+    playCorrect();
+    state.score += 10 * state.level;
+    state.stars += 3;
+    state.words++;
+    state.totalCorrect++;
+    state.correctStreak++;
+    state.levelWordsDone++;
+    spawnParticles(cx, cy, 18, ['#FFD700','#FF8C00','#FF69B4','#00E676','#87CEEB']);
+    showFeedback('correct', cx, cy);
+    playStar();
+    const guideMsg = ['أحسنت! 🌟','رائع! ✨','ممتاز! 🎉','أنت ذكي جداً! 🧠','رائع جداً! 💫'];
+    showGuide(guideMsg[Math.floor(Math.random() * guideMsg.length)]);
+    updateHUD();
+    setTimeout(() => {
+      el.remove();
+      wordElements = wordElements.filter(w => w.el !== el);
+    }, 700);
+
+    if (state.totalCorrect % 5 === 0) {
+      setTimeout(startMiniGame, 800);
+    } else if (state.levelWordsDone >= state.levelWordsTarget) {
+      setTimeout(showLevelComplete, 900);
+    }
+  } else {
+    el.classList.add('wrong-anim');
+    playWrong();
+    state.lives = Math.max(0, state.lives - 1);
+    state.score = Math.max(0, state.score - 3);
+    state.correctStreak = 0;
+    showFeedback('wrong', cx, cy);
+    showReason(getReasonText(el.dataset.word, wordType));
+    updateHUD();
+    setTimeout(() => {
+      el.classList.remove('wrong-anim');
+      el.style.top = (elY < 0 ? 100 : elY) + 'px';
+    }, 500);
+    if (state.lives === 0) setTimeout(gameOver, 600);
+  }
+}
+
+function clearAllWords() {
+  wordElements.forEach(w => {
+    clearInterval(w.fallInterval);
+    w.el.remove();
+  });
+  wordElements = [];
+}
+
+let spawnInterval;
+
+function startSpawning() {
+  clearInterval(spawnInterval);
+  const delay = [4000, 3000, 2200][state.level - 1];
+  spawnInterval = setInterval(() => {
+    if (state.phase === 'game') spawnWord();
+  }, delay);
+  spawnWord();
+}
+
+function startTimer() {
+  if (state.level < 3) return;
+  state.timeLeft = 60;
+  clearInterval(state.timerInterval);
+  const timerEl = document.getElementById('timer-display');
+  timerEl.style.display = 'flex';
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    timerEl.textContent = '⏱ ' + state.timeLeft + 'ث';
+    timerEl.classList.toggle('danger', state.timeLeft <= 10);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      showLevelComplete();
+    }
+  }, 1000);
+}
+
+function showLevelComplete() {
+  state.phase = 'level';
+  clearInterval(spawnInterval);
+  clearInterval(state.timerInterval);
+  clearAllWords();
+  clearTimeout(state.villainTimeout);
+  document.getElementById('villain').style.display = 'none';
+
+  const badgeIdx = state.level - 1;
+  const badge = BADGES[badgeIdx];
+  state.badges.push(badge);
+  playLevelUp();
+
+  document.getElementById('treasure-emoji').textContent = '🎁';
+  document.getElementById('medal-text').textContent = `🎉 مبروك! حصلت على: ${badge.name}`;
+  document.getElementById('badge-icon').textContent = badge.emoji;
+
+  const msgs = [
+    'أحسنت! لقد أكملت المرحلة الأولى بنجاح! استعد للمرحلة الثانية!',
+    'رائع جداً! المرحلة الثانية انتهت! المرحلة الأخيرة تنتظرك!',
+    'مذهل! لقد أكملت جميع المراحل! أنت بطل حقيقي!',
+  ];
+  document.getElementById('level-msg').textContent = msgs[state.level - 1] || msgs[2];
+
+  const medalsDiv = document.getElementById('all-medals-display');
+  medalsDiv.innerHTML = '';
+  state.badges.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'medal-item';
+    item.innerHTML = `<span class="m-emoji">${b.emoji}</span>${b.name}`;
+    medalsDiv.appendChild(item);
+  });
+
+  const nextBtn = document.getElementById('next-level-btn');
+  if (state.level >= 3) {
+    nextBtn.textContent = '🏆 شاهد النتائج';
+    nextBtn.onclick = showWinScreen;
+  } else {
+    nextBtn.textContent = '▶ المرحلة التالية';
+    nextBtn.onclick = nextLevel;
+  }
+
+  showScreen('level-screen');
+  setTimeout(() => startFireworks(), 500);
+}
+
+function nextLevel() {
+  if (state.level >= 3) {
+    showWinScreen();
+    return;
+  }
+  state.level++;
+  state.levelWordsDone = 0;
+  state.levelWordsTarget = 8 + (state.level - 1) * 2;
+  state.phase = 'game';
+  showScreen('game-screen');
+  updateHUD();
+  startSpawning();
+  startTimer();
+  scheduleVillain();
+  showGuide(GUIDE_MSGS[Math.floor(Math.random() * GUIDE_MSGS.length)]);
+}
+
+function scheduleVillain() {
+  clearTimeout(state.villainTimeout);
+  const delay = 12000 + Math.random() * 15000;
+  state.villainTimeout = setTimeout(() => {
+    if (state.phase !== 'game') return;
+    showVillain();
+  }, delay);
+}
+
+function showVillain() {
+  const villain = document.getElementById('villain');
+  const gameArea = document.getElementById('game-area');
+  const W = gameArea.offsetWidth;
+  const H = gameArea.offsetHeight;
+  const villainSize = window.innerWidth < 600 ? 75 : 100;
+  villain.style.left = (Math.random() * (W - villainSize - 20) + 10) + 'px';
+  villain.style.top = (Math.random() * (H * 0.35) + H * 0.12) + 'px';
+  villain.style.display = 'block';
+  playVillain();
+  showGuide('انتبه! وحش النسيان ظهر! انقر عليه بسرعة! 😱');
+  setTimeout(() => {
+    if (villain.style.display !== 'none') {
+      villain.style.display = 'none';
+      state.lives = Math.max(0, state.lives - 1);
+      state.score = Math.max(0, state.score - 5);
+      updateHUD();
+      if (state.lives === 0) gameOver();
+      else scheduleVillain();
+    }
+  }, 4000);
+}
+
+function hitVillain() {
+  const villain = document.getElementById('villain');
+  villain.style.display = 'none';
+  const rect = villain.getBoundingClientRect();
+  spawnParticles(rect.left + 30, rect.top + 30, 12, ['#FF4466','#FF8C00','#FFD700']);
+  state.stars += 5;
+  state.score += 20;
+  updateHUD();
+  showGuide('أحسنت! لقد هزمت وحش النسيان! 💪');
+  scheduleVillain();
+}
+
+function startMiniGame() {
+  state.phase = 'mini';
+  clearInterval(spawnInterval);
+  clearAllWords();
+  const mg = MINI_GAMES[Math.floor(Math.random() * MINI_GAMES.length)];
+  document.getElementById('mini-game-title').textContent = mg.title;
+  document.getElementById('mini-score').textContent = '0';
+  state.miniScore = 0;
+  showScreen('mini-game-screen');
+  runMiniGame(mg.type);
+}
+
+function runMiniGame(type) {
+  const area = document.getElementById('mini-game-area');
+  area.innerHTML = '';
+  const timerBar = document.getElementById('mini-timer-bar');
+  timerBar.style.width = '100%';
+  let timeLeft = 10;
+  const emojis = { stars:'⭐', balloons:'🎈', butterflies:'🦋', coins:'🪙' };
+  const emoji = emojis[type] || '⭐';
+  let spawnT;
+
+  function spawnTarget() {
+    const t = document.createElement('div');
+    t.className = 'mini-target';
+    t.textContent = emoji;
+    t.style.fontSize = '36px';
+    const targetSize = window.innerWidth < 600 ? 48 : 60;
+    t.style.left = (Math.random() * (area.offsetWidth - targetSize - 10) + 5) + 'px';
+    t.style.top = (Math.random() * (area.offsetHeight - targetSize - 10) + 5) + 'px';
+    t.style.fontSize = window.innerWidth < 600 ? '32px' : '36px';
+    t.style.padding = window.innerWidth < 600 ? '8px' : '4px';
+    t.addEventListener('click', () => {
+      t.classList.add('hit');
+      state.miniScore++;
+      state.stars += 2;
+      state.score += 5;
+      document.getElementById('mini-score').textContent = state.miniScore;
+      playStar();
+      spawnParticles(
+        t.getBoundingClientRect().left,
+        t.getBoundingClientRect().top,
+        6,
+        ['#FFD700','#FF69B4']
+      );
+      setTimeout(() => t.remove(), 300);
+    });
+    t.addEventListener('touchstart', e => { e.preventDefault(); t.click(); }, { passive: false });
+    t.addEventListener('touchend', e => { e.preventDefault(); }, { passive: false });
+    area.appendChild(t);
+    setTimeout(() => { if (t.parentNode) t.remove(); }, 2000);
+  }
+
+  spawnT = setInterval(spawnTarget, 700);
+  spawnTarget();
+
+  const countdown = setInterval(() => {
+    timeLeft -= 0.1;
+    timerBar.style.width = (timeLeft / 10 * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      clearInterval(spawnT);
+      area.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:14px;">
+        <div style="font-size:48px;">${emoji}</div>
+        <div style="color:#FFD700;font-size:20px;font-weight:900;">أحسنت! جمعت ${state.miniScore} نقاط!</div>
+      </div>`;
+      updateHUD();
+      setTimeout(() => {
+        state.phase = 'game';
+        showScreen('game-screen');
+        startSpawning();
+        if (state.level >= 3) startTimer();
+      }, 2000);
+    }
+  }, 100);
+}
+
+function gameOver() {
+  clearInterval(spawnInterval);
+  clearInterval(state.timerInterval);
+  clearTimeout(state.villainTimeout);
+  clearAllWords();
+  state.phase = 'over';
+  document.getElementById('villain').style.display = 'none';
+  const hud = document.getElementById('hud');
+  hud.style.display = 'none';
+  document.getElementById('guide').style.display = 'none';
+  document.getElementById('shop-btn').style.display = 'none';
+  showWinScreen();
+}
+
+function showWinScreen() {
+  state.phase = 'win';
+  clearInterval(spawnInterval);
+  clearInterval(state.timerInterval);
+  clearAllWords();
+  document.getElementById('villain').style.display = 'none';
+  document.getElementById('cert-player-name').textContent = state.playerName || 'البطل';
+  document.getElementById('cert-score').textContent = state.score;
+  document.getElementById('cert-stars').textContent = state.stars;
+  document.getElementById('cert-words').textContent = state.words;
+  const now = new Date();
+  document.getElementById('cert-date').textContent = now.toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' });
+
+  const winMedals = document.getElementById('win-medals');
+  winMedals.innerHTML = '';
+  BADGES.forEach((b, i) => {
+    const item = document.createElement('div');
+    item.className = 'medal-item';
+    item.style.opacity = state.badges[i] ? '1' : '0.3';
+    item.innerHTML = `<span class="m-emoji">${b.emoji}</span>${b.name}`;
+    winMedals.appendChild(item);
+  });
+
+  showScreen('win-screen');
+  setTimeout(() => startFireworks(), 400);
+}
+
+function printCert() {
+  const cert = document.getElementById('cert-section');
+  const original = document.body.innerHTML;
+  document.body.innerHTML = cert.outerHTML;
+  window.print();
+  document.body.innerHTML = original;
+  location.reload();
+}
+
+function openShop() {
+  renderShop();
+  showScreen('shop-screen');
+}
+
+function closeShop() {
+  showScreen('game-screen');
+}
+
+function renderShop() {
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = '';
+  SHOP_ITEMS.forEach(item => {
+    const el = document.createElement('div');
+    const owned = state.ownedItems.includes(item.id);
+    const equipped = state.equippedItems[item.type] === item.id;
+    el.className = 'shop-item' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
+    el.innerHTML = `
+      <div class="shop-emoji">${item.emoji}</div>
+      <div class="shop-name">${item.name}</div>
+      ${owned
+        ? `<div class="shop-status">${equipped ? '✅ مجهز' : '✔ مملوك'}</div>`
+        : `<div class="shop-price">⭐ ${item.price}</div>`
+      }
+    `;
+    el.onclick = () => {
+      if (owned) {
+        state.equippedItems[item.type] = equipped ? null : item.id;
+        renderShop();
+      } else if (state.stars >= item.price) {
+        state.stars -= item.price;
+        state.ownedItems.push(item.id);
+        updateHUD();
+        renderShop();
+        playStar();
+        spawnParticles(200, 300, 10, ['#FFD700','#9C27B0','#FF69B4']);
+      } else {
+        showGuide('نجومك لا تكفي! اجمع المزيد! ⭐');
+      }
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('shop-stars-display').textContent = state.stars;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  const nameInput = document.getElementById('player-name-input');
+  state.playerName = nameInput.value.trim() || 'البطل';
+
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('guide').style.display = 'flex';
+  document.getElementById('shop-btn').style.display = 'flex';
+  document.getElementById('timer-display').style.display = state.level >= 3 ? 'block' : 'none';
+
+  state.levelWordsTarget = 8;
+  state.phase = 'game';
+  updateHUD();
+  showScreen('game-screen');
+  startSpawning();
+  scheduleVillain();
+  setTimeout(() => showGuide('مرحباً يا ' + state.playerName + '! لننقذ المملكة! 🏰'), 800);
+}
+
+window.addEventListener('resize', () => {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  fwCanvas.width = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+  // Re-clamp any active word cards to stay on screen
+  document.querySelectorAll('.word-card').forEach(card => {
+    const left = parseFloat(card.style.left) || 0;
+    const top = parseFloat(card.style.top) || 0;
+    const maxLeft = window.innerWidth - (card.offsetWidth || 120);
+    if (left > maxLeft) card.style.left = Math.max(0, maxLeft) + 'px';
+  });
+});
+
+// Prevent scroll bounce on iOS during drag
+document.addEventListener('touchmove', function(e) {
+  if (e.target.classList.contains('word-card') || 
+      (e.target.closest && e.target.closest('.word-card'))) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+window.addEventListener('load', () => {
+  initBg();
+  drawBg(0);
+  setTimeout(() => {
+    document.getElementById('loading-screen').style.opacity = '0';
+    document.getElementById('loading-screen').style.transition = 'opacity 0.6s';
+    setTimeout(() => document.getElementById('loading-screen').remove(), 700);
+  }, 1600);
+});
+
+document.getElementById('player-name-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') startGame();
+});
+</script>
+</body>
+</html>
